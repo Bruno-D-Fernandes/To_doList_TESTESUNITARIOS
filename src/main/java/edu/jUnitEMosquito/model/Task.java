@@ -28,6 +28,7 @@ public class Task {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    @ManyToMany
     @JoinTable(
             name = "task_tags",
             joinColumns = @JoinColumn(name = "task_id"),

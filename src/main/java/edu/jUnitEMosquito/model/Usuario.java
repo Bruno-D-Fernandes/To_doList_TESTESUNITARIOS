@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "usuario")
@@ -28,8 +27,12 @@ public class Usuario implements UserDetails {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "lider")
-    private List<Group> groups;
+    @OneToMany(mappedBy = "lider", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    private List<Group> meusGrupos;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioGrupo> usuarioGrupos;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,24 +65,12 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Usuario usuario = (Usuario) o;
-        return Objects.equals(nome, usuario.nome) && Objects.equals(email, usuario.email) && Objects.equals(password, usuario.password);
-    }
-
-    @Override
     public String toString() {
         return "Usuario{" +
                 "nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nome, email, password);
     }
 
     public String getNome() {
