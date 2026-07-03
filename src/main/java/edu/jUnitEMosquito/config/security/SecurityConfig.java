@@ -3,6 +3,7 @@ package edu.jUnitEMosquito.config.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,7 +30,10 @@ public class SecurityConfig {
         return httpSecurity.
                 csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(http ->
-                        http.anyRequest().permitAll())
+                        http
+                                .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/usuarios/register").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
