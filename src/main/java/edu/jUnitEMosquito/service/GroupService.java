@@ -9,8 +9,6 @@ import edu.jUnitEMosquito.repository.GroupRepository;
 import edu.jUnitEMosquito.repository.UsuarioGrupoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,13 +29,14 @@ public class GroupService {
     @Transactional
     public void createGroup(CreateGroupDTO createGroupDTO){
 
+        //Verifica se o usuário já possuí um grupo com esse nome
         groupRepository.findGroupByNomeAndLider(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo())
-                .ifPresent(groups -> new UsuarioJaPossuiGrupoComEsseNomeException());
+                .ifPresent(groups -> {
+                    throw new UsuarioJaPossuiGrupoComEsseNomeException();
+                });
 
         Group group = new Group(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo());
 
-
-        //Verificar se o usuário já possuí um grupo com esse nome
 
         groupRepository.save(group);
     }
