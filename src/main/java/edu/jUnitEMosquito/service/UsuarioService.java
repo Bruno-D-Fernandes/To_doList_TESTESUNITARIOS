@@ -27,7 +27,7 @@ public class UsuarioService {
     }
 
     public String login(LoginRequestDTO request) {
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
+        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(request.email().toLowerCase(), request.password());
         authenticationManager.authenticate(authenticationToken);
 
         return jwtService.generateToken(request.email());
@@ -36,7 +36,7 @@ public class UsuarioService {
 
     public void register(RegisterRequestDTO registerRequestDTO){
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerRequestDTO.password());
-        Usuario usuario = new Usuario(registerRequestDTO.nome(), registerRequestDTO.email(), encryptedPassword);
+        Usuario usuario = new Usuario(registerRequestDTO.nome(), registerRequestDTO.email().toLowerCase(), encryptedPassword);
         usuarioRepository.save(usuario);
     }
 }

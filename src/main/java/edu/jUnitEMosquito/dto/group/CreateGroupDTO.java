@@ -1,4 +1,9 @@
 package edu.jUnitEMosquito.dto.group;
 
-public record CreateGroupDTP() {
+import edu.jUnitEMosquito.model.Usuario;
+
+public record CreateGroupDTO(
+        String nomeGrupo,
+        Usuario donoGrupo
+) {
 }
