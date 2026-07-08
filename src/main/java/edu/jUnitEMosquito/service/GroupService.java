@@ -1,6 +1,7 @@
 package edu.jUnitEMosquito.service;
 
 import edu.jUnitEMosquito.dto.group.CreateGroupDTO;
+import edu.jUnitEMosquito.dto.group.UserGroupsDto;
 import edu.jUnitEMosquito.exception.group.UsuarioJaPossuiGrupoComEsseNomeException;
 import edu.jUnitEMosquito.model.Group;
 import edu.jUnitEMosquito.model.Usuario;
@@ -38,7 +39,7 @@ public class GroupService {
         if (!matches) throw new RuntimeException("Nome do grupo inválido");
 
 
-        //Verifica se o usuário já possui um grupo com esse nome
+        // Verifica se o usuário já possui um grupo com esse nome
         groupRepository.findGroupByNomeAndLider(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo())
                 .ifPresent(groups -> {
                     throw new UsuarioJaPossuiGrupoComEsseNomeException();
@@ -53,8 +54,20 @@ public class GroupService {
     }
 
     public List<Group> getAllGroupsByAuthUser(Usuario usuarioAuth) {
-        Optional<List<Group>> allByUsuario = groupRepository.findAllByLider(usuarioAuth);
-        List<Group> groups = allByUsuario.orElseThrow(() -> new RuntimeException("Usuário não possui grupos!"));
+
+        // Fazer tratamento de exceção
+        List<UsuarioGrupo> usuarioGrupos = usuarioGrupoRepository.findByUsuarioN(usuarioAuth)
+                .orElseThrow(() -> new RuntimeException("Usuário não possui grupos!"));
+
+        // Finalizar aqui
+        List<UserGroupsDto> response = usuarioGrupos.stream().
+                map((userGroup) -> {
+                    UserGroupsDto dto dto =  new UserGroupsDto(
+                            userGroup.getGroup().getId(),
+                            userGroup.getGroup().getNome(),
+
+                    )
+                }).toList();
 
         // colocar Dto's
         return groups;

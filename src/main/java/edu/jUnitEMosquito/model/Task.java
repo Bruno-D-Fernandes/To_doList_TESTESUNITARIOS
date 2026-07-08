@@ -21,6 +21,10 @@ public class Task {
     @Column(name = "due_date")
     private OffsetDateTime dataLimite;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TaskStatus taskStatus;
+
     @ManyToOne
     @JoinColumn(name = "created_by")
     private Usuario creator;
@@ -36,6 +40,12 @@ public class Task {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tags> tags;
+
+    public enum TaskStatus{
+        PAUSED,
+        FINISHED,
+        WORKING
+    }
 
     public Task() {
     }

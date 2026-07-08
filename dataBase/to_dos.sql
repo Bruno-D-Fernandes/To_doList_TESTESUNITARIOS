@@ -39,6 +39,7 @@ CREATE TABLE tasks (
     status_id BIGINT UNSIGNED NULL,
     title VARCHAR(200) NOT NULL,
     created_by BIGINT UNSIGNED NOT NULL,
+    status ENUM('paused', 'finish', 'working') DEFAULT 'working' NOT NULL,
     due_date DATETIME NULL,
     CONSTRAINT fk_task_group FOREIGN KEY (group_id)
         REFERENCES task_groups (id)
