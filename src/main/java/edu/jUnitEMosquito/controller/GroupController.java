@@ -45,9 +45,14 @@ public class GroupController {
     }
 
     // resolver lógica de négocio na camada de service
-    @DeleteMapping("/DeleteGroup")
-    public ResponseEntity deleteGroup(){
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/DeleteGroup/{groupId}")
+    public ResponseEntity deleteGroup(
+            @AuthenticationPrincipal Usuario usuarioAuth,
+            @PathVariable Long groupId
+    ){
+
+        groupService.deleteGroup(usuarioAuth, groupId);
+        return ResponseEntity.ok("Grupo deletado com sucesso!");
     }
 
 

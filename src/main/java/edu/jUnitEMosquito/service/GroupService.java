@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GroupService {
@@ -29,11 +31,20 @@ public class GroupService {
     @Transactional
     public void createGroup(CreateGroupDTO createGroupDTO){
 
-        //Verifica se o usuário já possuí um grupo com esse nome
+        // De os seus pulos pra lembrar desse regex ae Bruno de futuro
+        boolean matches = Pattern.matches(createGroupDTO.nomeGrupo(), "^(?=(?:[^ ]* ){0,3}[^ ]*$)[A-Za-z0-9 ]{5,15}$");
+
+        // Fazer tratamento próprio
+        if (!matches) throw new RuntimeException("Nome do grupo inválido");
+
+
+        //Verifica se o usuário já possui um grupo com esse nome
         groupRepository.findGroupByNomeAndLider(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo())
                 .ifPresent(groups -> {
                     throw new UsuarioJaPossuiGrupoComEsseNomeException();
                 });
+
+        
 
         Group group = new Group(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo());
 
@@ -43,18 +54,25 @@ public class GroupService {
 
     public List<Group> getAllGroupsByAuthUser(Usuario usuarioAuth) {
         Optional<List<Group>> allByUsuario = groupRepository.findAllByLider(usuarioAuth);
-        List<Group> groups = allByUsuario.orElseThrow(() -> new RuntimeException("Usuário não possuí grupos!"));
+        List<Group> groups = allByUsuario.orElseThrow(() -> new RuntimeException("Usuário não possui grupos!"));
 
+        // colocar Dto's
         return groups;
     }
 
-    public void deleteGroup(Usuario usuarioAuth, String groupName){
+    // Fazer testes unitários
+    @Transactional
+    public void deleteGroup(Usuario usuarioAuth, Long groupId){
 
-        // por nome é um péssimo parâmetro para isso, já que um usuário não pode ser dono de 2 grupos com o mesmo nome
-        // porem pode participar de mais de um grupo de tasks com o mesmo nome
-        UsuarioGrupo usuarioGrupos = usuarioGrupoRepository.findByUsuarioAndGroup_Nome(usuarioAuth, groupName)
+        UsuarioGrupo usuarioGrupos = usuarioGrupoRepository.findByUsuarioAndGroup_Id(usuarioAuth, groupId)
+                // Fazer tratamento de exceção
                         .orElseThrow(() -> new RuntimeException("Usuário não participa de nenhum grupo com esse nome."));
 
+        // Fazer tratamento de exceção
+        // Authorization
+        if (usuarioGrupos.getRoles() != UsuarioGrupo.Roles.OWNER) throw new RuntimeException("Usuário não tem permissão para essa ação.");
+
+        groupRepository.delete(usuarioGrupos.getGroup());
     }
 
 
