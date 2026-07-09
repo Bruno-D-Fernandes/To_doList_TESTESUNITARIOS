@@ -112,13 +112,13 @@ public class GroupService {
             if(newOwnerList.size() != 1) throw new UsuarioNaoParticipaDoGrupo();
             if(ownerList.size() != 1) throw new UsuarioNaoParticipaDoGrupo();
 
-            UsuarioGrupo owner = ownerList.getFirst();
-            UsuarioGrupo newOwner = newOwnerList.getFirst();
+            UsuarioGrupo owner = ownerList.get(0);
+            UsuarioGrupo newOwner = newOwnerList.get(0);
 
             // um usuário não pode receber a posse de um grupo se já possuir um groupo com esse nome
             // Se true significa uma mudança de líder
             if(!owner.equals(newOwner)){
-                if(!(owner.getRoles() == UsuarioGrupo.Roles.OWNER)) throw new UsuarioNaoPossuiPermissao(UsuarioGrupo.Roles.OWNER.name());
+                if(!(owner.getRoles() == UsuarioGrupo.Roles.OWNER)) throw new UsuarioNaoPossuiPermissao(UsuarioGrupo.Roles.OWNER);
 
                 // N + 1 resolvível com groupRepository.findBy + JoinFetch | não faço isso por que penso que ia
                 // aumentar muito a complexidade desse método, que já está extenso
@@ -163,7 +163,7 @@ public class GroupService {
         // Aspect?
         // Authorization
         if (usuarioGrupo.getRoles() != UsuarioGrupo.Roles.OWNER)
-            throw new UsuarioNaoPossuiPermissao();
+            throw new UsuarioNaoPossuiPermissao(UsuarioGrupo.Roles.OWNER);
 
         groupRepository.delete(usuarioGrupo.getGrupo());
     }

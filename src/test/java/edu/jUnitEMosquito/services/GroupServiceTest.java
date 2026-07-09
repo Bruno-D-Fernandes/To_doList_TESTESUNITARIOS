@@ -64,7 +64,7 @@ public class GroupServiceTest {
 
             // esse when não é necessário, já que ele não tem retorno e sua existência não afeta o funcionamento do trecho
             when(groupRepository.findGroupByNomeAndLider(createGrupoDto.nomeGrupo(), createGrupoDto.donoGrupo()))
-                    .thenReturn(Optional.empty());
+                    .thenReturn(List.of());
 
             groupService.createGroup(createGrupoDto);
 
@@ -90,7 +90,7 @@ public class GroupServiceTest {
         void exceptionThrowCase1(){
             Usuario usuario = new Usuario("Bruno", "bruno@gmail.com", "123");
 
-            when(groupRepository.findGroupByNomeAndLider("Grupo1", usuario)).thenReturn(Optional.of(List.of(group)));
+            when(groupRepository.findGroupByNomeAndLider("Grupo1", usuario)).thenReturn(List.of(group));
 
             Assertions.assertThrows(UsuarioJaPossuiGrupoComEsseNomeException.class, () -> {
                 groupService.createGroup(createGrupoDto);
