@@ -15,7 +15,7 @@ public class UsuarioGrupo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
+    private Group grupo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,8 +35,8 @@ public class UsuarioGrupo {
     public UsuarioGrupo() {
     }
 
-    public UsuarioGrupo(Group group, Usuario usuario, Roles roles) {
-        this.group = group;
+    public UsuarioGrupo(Group grupo, Usuario usuario, Roles roles) {
+        this.grupo = grupo;
         this.usuario = usuario;
         this.roles = roles;
     }
@@ -45,7 +45,7 @@ public class UsuarioGrupo {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         UsuarioGrupo that = (UsuarioGrupo) o;
-        return Objects.equals(id, that.id) && Objects.equals(group, that.group) && Objects.equals(usuario, that.usuario) && roles == that.roles;
+        return Objects.equals(id, that.id) && Objects.equals(grupo, that.grupo) && Objects.equals(usuario, that.usuario) && roles == that.roles;
     }
 
     @Override
@@ -61,12 +61,12 @@ public class UsuarioGrupo {
         this.id = id;
     }
 
-    public Group getGroup() {
-        return group;
+    public Group getGrupo() {
+        return grupo;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGrupo(Group grupo) {
+        this.grupo = grupo;
     }
 
     public Usuario getUsuario() {

@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
+    // Má prática
     Optional<List<Group>> findAllByLider(Usuario usuario);
 
-    Optional<List<Group>> findGroupByNomeAndLider(String nome, Usuario user);
+    List<Group> findGroupByNomeAndLider(String nome, Usuario user);
 
     @Query(
             "SELECT g FROM Group g " +
@@ -21,5 +22,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
                     "JOIN g.usuarioGrupos ug " +
                     "WHERE ug.usuario = :usuario"
     )
-    Optional<List<Group>> findByUsuarioN(@Param("usuario") Usuario usuario);
+    List<Group> findByUsuarioN(@Param("usuario") Usuario usuario);
 }

@@ -17,4 +17,10 @@ public interface UsuarioGrupoRepository extends JpaRepository<UsuarioGrupo, Long
             Long id
     );
 
+    @Query("SELECT ug FROM UsuarioGrupo ug " +
+            "JOIN FETCH ug.grupo g " +
+            "JOIN FETCH ug.usuario u " +
+            "WHERE g.id = :id")
+    List<UsuarioGrupo> findByGroup_IdN(@Param("id") Long id);
+
 }
