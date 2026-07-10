@@ -136,7 +136,7 @@ public class GroupServiceTest {
         @Test
         void exceptionThrowCase1(){
 
-            when(usuarioGrupoRepository.findByUsuarioAndGroup_Id(any(), any())).thenReturn(Optional.empty());
+            when(usuarioGrupoRepository.findByUsuarioAndGrupo_Id(any(), any())).thenReturn(Optional.empty());
 
             GrupoNaoEncontrado excecao = Assertions.assertThrows(GrupoNaoEncontrado.class, () -> {
                 groupService.deleteGroup(any(), any());
@@ -148,7 +148,7 @@ public class GroupServiceTest {
         @Test
         void exceptionThrowCase2(){
 
-            when(usuarioGrupoRepository.findByUsuarioAndGroup_Id(any(), any())).thenReturn(Optional.of(usuarioGrupo));
+            when(usuarioGrupoRepository.findByUsuarioAndGrupo_Id(any(), any())).thenReturn(Optional.of(usuarioGrupo));
 
             UsuarioNaoPossuiPermissao excecao = Assertions.assertThrows(UsuarioNaoPossuiPermissao.class, () -> {
                 groupService.deleteGroup(any(), any());
@@ -160,7 +160,7 @@ public class GroupServiceTest {
         @Test
         void succesCase1(){
             usuarioGrupo.setRoles(UsuarioGrupo.Roles.OWNER);
-            when(usuarioGrupoRepository.findByUsuarioAndGroup_Id(any(), any())).thenReturn(Optional.of(usuarioGrupo));
+            when(usuarioGrupoRepository.findByUsuarioAndGrupo_Id(any(), any())).thenReturn(Optional.of(usuarioGrupo));
 
             groupService.deleteGroup(any(), any());
 

@@ -32,12 +32,11 @@ public class UsuarioService {
     public String login(LoginRequestDTO request) {
 
         // Generalizar a exception deixa o código mais acoplado?
-        boolean emailValido = Pattern.matches("^[\\w]{5,55}[@][\\w]{3,9}[.][\\w]{2,3}[.]?[\\w]{2,3}?$", request.email());
+        boolean emailValido = Pattern.matches("^[\\w]{5,55}[@][\\w]{3,9}[.][\\w]{2,3}(?:[.][\\w]{2,3})?$", request.email());
         if(!emailValido) throw new DadoInvalidoException("Email");
 
-        boolean passwordValido = Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{5,}$$", request.password());
+        boolean passwordValido = Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{5,}$", request.password());
         if(!passwordValido) throw new DadoInvalidoException("Senha");
-
 
 
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(request.email().toLowerCase(), request.password());

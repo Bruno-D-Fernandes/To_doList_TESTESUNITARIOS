@@ -45,7 +45,7 @@ public class GroupService {
         // De os seus pulos pra lembrar desse regex ae Bruno de futuro
         // Valida o nome do grupo
         boolean matches = Pattern.matches("^(?=(?:[^ ]* ){0,3}[^ ]*$)[A-Za-z0-9 ]{5,15}$", createGroupDTO.nomeGrupo());
-        if (!matches) throw new NomeDoGrupoInvalido();
+        if (matches) throw new NomeDoGrupoInvalido();
 
         // Verifica se o usuário já possui um grupo com esse nome
         List<Group> groupByNomeAndLider = groupRepository.findGroupByNomeAndLider(createGroupDTO.nomeGrupo(), createGroupDTO.donoGrupo());
