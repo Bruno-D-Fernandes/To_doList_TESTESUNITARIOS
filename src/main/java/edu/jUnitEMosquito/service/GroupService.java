@@ -1,6 +1,7 @@
 package edu.jUnitEMosquito.service;
 
 import edu.jUnitEMosquito.dto.group.CreateGroupDTO;
+import edu.jUnitEMosquito.dto.group.MergeGroupDTO;
 import edu.jUnitEMosquito.dto.group.UserGroupsDto;
 import edu.jUnitEMosquito.dto.task.TaskGroupDto;
 import edu.jUnitEMosquito.exception.group.GrupoNaoEncontrado;
@@ -89,68 +90,61 @@ public class GroupService {
 
 
     @Transactional
-    // talvez seja interessante quebrar esse método em 2
-    // ou talvez quebrar isso em métodos privados, por se tratar de um projeto pessoal, não sei se compensa o tempo
-    public void mergeGroup(
-            Usuario usuarioAuth,
-            String newName,
-            Long newIdOwner,
-            Long groupId
-    ){
-        // Pego todos os membros e roles de um grupo, JoinFetch
-        List<UsuarioGrupo> newUsuarioGroup = usuarioGrupoRepository.findByGroup_IdN(groupId);
-        if(newUsuarioGroup.size() < 1) throw new GrupoNaoEncontrado();
+    public void mergeGroup(Usuario usuarioAuth, MergeGroupDTO mergeGroupDTO) {
+        List<UsuarioGrupo> newUsuarioGroup = usuarioGrupoRepository.findByGroup_IdN(mergeGroupDTO.groupId());
+        if (newUsuarioGroup.size() < 1) throw new GrupoNaoEncontrado();
 
-            List<UsuarioGrupo> ownerList = newUsuarioGroup.stream()
-                    .filter((usuarioGrupo) -> usuarioGrupo.getUsuario() == usuarioAuth)
-                    .toList();
+        UsuarioGrupo owner = newUsuarioGroup.stream()
+                .filter((usuarioGrupo) -> usuarioGrupo.getUsuario() == usuarioAuth)
+                .findFirst()
+                .orElseThrow(() -> new UsuarioNaoParticipaDoGrupo());
 
-            List<UsuarioGrupo> newOwnerList = newUsuarioGroup.stream()
-                    .filter((usuarioGrupo) -> usuarioGrupo.getUsuario().getId() == newIdOwner)
-                    .toList();
+        changeGroupOwner(newUsuarioGroup, owner, mergeGroupDTO.newIdOwner());
+        changeGroupName(owner, mergeGroupDTO.newName());
+    }
 
-            if(newOwnerList.size() != 1) throw new UsuarioNaoParticipaDoGrupo();
-            if(ownerList.size() != 1) throw new UsuarioNaoParticipaDoGrupo();
+    private void changeGroupOwner(List<UsuarioGrupo> usuarioGrupoList, UsuarioGrupo currentOwner, Long newOwnerId) {
+        List<UsuarioGrupo> newOwnerList = usuarioGrupoList.stream()
+                .filter((usuarioGrupo) -> usuarioGrupo.getUsuario().getId() == newOwnerId)
+                .toList();
 
-            UsuarioGrupo owner = ownerList.get(0);
-            UsuarioGrupo newOwner = newOwnerList.get(0);
+        if (newOwnerList.size() != 1) throw new UsuarioNaoParticipaDoGrupo();
 
-            // um usuário não pode receber a posse de um grupo se já possuir um groupo com esse nome
-            // Se true significa uma mudança de líder
-            if(!owner.equals(newOwner)){
-                if(!(owner.getRoles() == UsuarioGrupo.Roles.OWNER)) throw new UsuarioNaoPossuiPermissao(UsuarioGrupo.Roles.OWNER);
+        UsuarioGrupo newOwner = newOwnerList.get(0);
 
-                // N + 1 resolvível com groupRepository.findBy + JoinFetch | não faço isso por que penso que ia
-                // aumentar muito a complexidade desse método, que já está extenso
-                List<Group> groupByNomeAndLider = groupRepository.findGroupByNomeAndLider(owner.getGrupo().getNome(), newOwner.getUsuario());
-                if(groupByNomeAndLider.size() != 0) throw new UsuarioJaPossuiGrupoComEsseNomeException();
+        if (!currentOwner.equals(newOwner)) {
+            if (currentOwner.getRoles() != UsuarioGrupo.Roles.OWNER) 
+                throw new UsuarioNaoPossuiPermissao(UsuarioGrupo.Roles.OWNER);
 
-                owner.setRoles(UsuarioGrupo.Roles.MEMBER);
-                newOwner.setRoles(UsuarioGrupo.Roles.OWNER);
+            List<Group> groupByNomeAndLider = groupRepository.findGroupByNomeAndLider(
+                    currentOwner.getGrupo().getNome(), newOwner.getUsuario());
+            if (groupByNomeAndLider.size() != 0) 
+                throw new UsuarioJaPossuiGrupoComEsseNomeException();
 
-                usuarioGrupoRepository.save(owner);
-                usuarioGrupoRepository.save(newOwner);
-            }
+            currentOwner.setRoles(UsuarioGrupo.Roles.MEMBER);
+            newOwner.setRoles(UsuarioGrupo.Roles.OWNER);
 
-            if(owner.getGrupo().getNome().equals(newName)){
-                // Tenho que aprender esse négocio de aspecto
-                if(owner.getRoles() == UsuarioGrupo.Roles.MEMBER) throw new UsuarioNaoPossuiPermissao("Membros não podem trocar nome do grupo.");
+            usuarioGrupoRepository.save(currentOwner);
+            usuarioGrupoRepository.save(newOwner);
+        }
+    }
 
-                // Dono do grupo já possui grupo com esse nome
-                List<Group> groupByNomeAndLider = groupRepository.findGroupByNomeAndLider(newName, owner.getUsuario());
-                if(groupByNomeAndLider.size() != 0) throw new UsuarioJaPossuiGrupoComEsseNomeException("Dono do grupo já possui grupo com esse nome.");
+    private void changeGroupName(UsuarioGrupo owner, String newName) {
+        if (!owner.getGrupo().getNome().equals(newName)) {
+            if (owner.getRoles() == UsuarioGrupo.Roles.MEMBER) 
+                throw new UsuarioNaoPossuiPermissao("Membros não podem trocar nome do grupo.");
 
-                // Valida o nome do grupo
-                boolean matches = Pattern.matches("^(?=(?:[^ ]* ){0,3}[^ ]*$)[A-Za-z0-9 ]{5,15}$", newName);
-                if (!matches) throw new NomeDoGrupoInvalido();
+            List<Group> groupByNomeAndLider = groupRepository.findGroupByNomeAndLider(newName, owner.getUsuario());
+            if (groupByNomeAndLider.size() != 0) 
+                throw new UsuarioJaPossuiGrupoComEsseNomeException("Dono do grupo já possui grupo com esse nome.");
 
-                Group group = owner.getGrupo();
-                group.setNome(newName);
+            boolean matches = Pattern.matches("^(?=(?:[^ ]* ){0,3}[^ ]*$)[A-Za-z0-9 ]{5,15}$", newName);
+            if (!matches) throw new NomeDoGrupoInvalido();
 
-                //Penso que não seja necessário, porém estou colocando para ter certeza
-                groupRepository.save(group);
-            }
-
+            Group group = owner.getGrupo();
+            group.setNome(newName);
+            groupRepository.save(group);
+        }
     }
 
     // Fazer testes unitários
