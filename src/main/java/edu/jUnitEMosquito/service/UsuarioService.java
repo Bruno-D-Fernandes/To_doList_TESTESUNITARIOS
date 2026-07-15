@@ -38,7 +38,6 @@ public class UsuarioService {
         boolean passwordValido = Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{5,}$", request.password());
         if(!passwordValido) throw new DadoInvalidoException("Senha");
 
-
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(request.email().toLowerCase(), request.password());
         authenticationManager.authenticate(authenticationToken);
 

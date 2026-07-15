@@ -41,6 +41,14 @@ public class Task {
     )
     private List<Tags> tags;
 
+    public Task(String title, OffsetDateTime dataLimite, Usuario usuarioAuth, Group group, TaskStatus taskStatus) {
+        this.title = title;
+        this.dataLimite = dataLimite;
+        this.creator = usuarioAuth;
+        this.group = group;
+        this.taskStatus = taskStatus;
+    }
+
     public enum TaskStatus{
         PAUSED,
         FINISHED,
