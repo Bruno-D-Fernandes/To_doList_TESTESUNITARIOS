@@ -27,6 +27,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class GroupService {
 
@@ -70,12 +72,7 @@ public class GroupService {
              response = groupList.stream()
                     .map(userGroup -> {
                         List<TaskGroupDto> taskGroupDto = userGroup.getTasks().stream()
-                                .map(task -> new TaskGroupDto(
-                                        task.getId(),
-                                        task.getTitle(),
-                                        task.getDataLimite(),
-                                        task.getTaskStatus()
-                                ))
+                                .map(TaskGroupDto::new)
                                 .toList();
 
                         return new UserGroupsDto(

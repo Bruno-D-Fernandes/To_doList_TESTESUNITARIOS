@@ -23,5 +23,6 @@ public interface UsuarioGrupoRepository extends JpaRepository<UsuarioGrupo, Long
             "WHERE g.id = :id")
     List<UsuarioGrupo> findByGroup_IdN(@Param("id") Long id);
 
+    boolean existsByUsuarioAndGrupo_Id(Usuario usuario, Long id);
 
 }

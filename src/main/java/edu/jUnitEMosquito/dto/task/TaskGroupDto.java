@@ -8,6 +8,16 @@ public record TaskGroupDto(
         Long id,
         String title,
         OffsetDateTime tempoLimite,
-        Task.TaskStatus status
+        Task.TaskStatus status,
+        Long groupId
 ) {
+    public TaskGroupDto(Task task) {
+        this(
+                task.getId(),
+                task.getTitle(),
+                task.getDataLimite(),
+                task.getTaskStatus(),
+                task.getGroup().getId()
+        );
+    }
 }

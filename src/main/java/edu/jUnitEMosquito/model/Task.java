@@ -50,9 +50,14 @@ public class Task {
     }
 
     public enum TaskStatus{
-        PAUSED,
-        FINISHED,
-        WORKING
+        PAUSED("paused"),
+        FINISHED("finished"),
+        WORKING("working");
+
+        String status;
+        TaskStatus(String status) {
+            this.status = status;
+        }
     }
 
     public Task() {
