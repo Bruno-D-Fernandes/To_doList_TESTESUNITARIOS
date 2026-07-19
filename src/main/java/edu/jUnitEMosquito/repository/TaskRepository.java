@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    List<Task> findByGrupo_Id(Long groupId);
+    List<Task> findByGroup_Id(Long groupId);
 }

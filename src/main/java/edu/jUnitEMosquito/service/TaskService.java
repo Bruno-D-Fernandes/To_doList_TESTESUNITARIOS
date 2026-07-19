@@ -35,7 +35,7 @@ public class TaskService {
         boolean usuarioParticipaDoGrupo = usuarioGrupoRepository.existsByUsuarioAndGrupo_Id(usuarioAuth, groupId);
         if(!usuarioParticipaDoGrupo) throw new UsuarioNaoParticipaDoGrupo();
 
-        List<Task> tasks = taskRepository.findByGrupo_Id(groupId);
+        List<Task> tasks = taskRepository.findByGroup_Id(groupId);
         if(tasks.isEmpty()) throw new GrupoNaoPossuiTasksException();
 
         return tasks.stream().map(TaskGroupDto::new).toList();
