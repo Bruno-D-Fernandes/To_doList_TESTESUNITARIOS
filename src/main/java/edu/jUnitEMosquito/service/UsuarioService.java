@@ -51,7 +51,7 @@ public class UsuarioService {
         boolean nomeValido = Pattern.matches("^(?=^[^ ]+(?:[^ ]* ){0,4}[^ ]+$)[A-Za-z0-9 _]{5,25}$", registerRequestDTO.nome());
         if(!nomeValido) throw new DadoInvalidoException("Nome");
 
-        boolean emailValido = Pattern.matches("^[\\w]{5,55}[@][\\w]{3,9}[.][\\w]{2,3}[.]?[\\w]{2,3}?$", registerRequestDTO.email());
+        boolean emailValido = Pattern.matches("^[\\w]{5,55}[@][\\w]{3,9}[.][\\w]{2,3}(?:[.][\\w]{2,3})?$", registerRequestDTO.email());
         if(!emailValido) throw new DadoInvalidoException("Email");
 
         boolean passwordValido = Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{5,}$$", registerRequestDTO.password());
